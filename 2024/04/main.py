@@ -43,9 +43,40 @@ def solve_part1(data: np.ndarray) -> int | None:
     return xmas_count
 
 
+def find_xmas_pattern(data: np.ndarray) -> int:
+    """Find X-MAS patterns using convolution-like approach
+
+    Pattern:
+    M ? S
+    ? A ?
+    M ? S
+    """
+    count = 0
+    rows, cols = data.shape
+
+    # Check all possible 3x3 windows
+    for i in range(rows - 2):
+        for j in range(cols - 2):
+            # Extract next 3x3 window
+            window = data[i:i+3, j:j+3]
+
+            # If center is not 'A', skip
+            if window[1, 1] != 'A':
+                continue
+
+            # Both diagonals must be "MAS" or "SAM"
+            diagonal1 = ''.join(window.diagonal())  # Main diagonal
+            diagonal2 = ''.join(np.fliplr(window).diagonal())  # Anti-diagonal
+
+            if (diagonal1 in ['MAS', 'SAM'] and diagonal2 in ['MAS', 'SAM']):
+                count += 1
+
+    return count
+
+
 def solve_part2(data: np.ndarray) -> int | None:
-    """???"""
-    return None
+    """Find occurrences of 'XMAS' words in 'X' shapes"""
+    return find_xmas_pattern(data)
 
 
 def main():
@@ -59,11 +90,11 @@ def main():
     assert sample_result_1 == expected_sample_result_1, \
         f"Expected {expected_sample_result_1} but got {sample_result_1}"
 
-    # # Part 2 test
-    # sample_result_2 = solve_part2(sample_data)
-    # expected_sample_result_2 = 0
-    # assert sample_result_2 == expected_sample_result_2, \
-    #     f"Expected {expected_sample_result_2} but got {sample_result_2}"
+    # Part 2 test
+    sample_result_2 = solve_part2(sample_data)
+    expected_sample_result_2 = 9
+    assert sample_result_2 == expected_sample_result_2, \
+        f"Expected {expected_sample_result_2} but got {sample_result_2}"
 
     # Load actual input data
     input_data = read_input('input.txt')
@@ -71,10 +102,11 @@ def main():
 
     # Solve problem with actual data
     result_1 = solve_part1(input_data)
-    print(f"Part 1 -- XMAS occurrences: {result_1}")
+    print(f"Part 1 -- XMAS words: {result_1}")
 
     result_2 = solve_part2(input_data)
-    print(f"Part 2 -- ??? : {result_2}")
+    print(f"Part 2 -- X-MAS patterns: {result_2}")
+
 
 if __name__ == "__main__":
     main()
