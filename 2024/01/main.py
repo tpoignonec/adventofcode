@@ -28,8 +28,17 @@ def solve_part1(data):
 
 
 def solve_part2(data):
-    """Placeholder for part 2 solution."""
-    return 0
+    """Similarity score"""
+    # Split the data into two columns (left and right lists)
+    left_list = data[:, 0]
+    right_list = data[:, 1]
+
+    # For each element in left_list, find the number of occurrences in right_list
+    similarity_score = 0
+    for item in left_list:
+        similarity_score += item * np.count_nonzero(right_list == item)
+
+    return similarity_score
 
 
 def main():
