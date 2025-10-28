@@ -31,6 +31,11 @@ def are_adjacent_levels_within_range(arr: np.ndarray, min_diff: int = 1, max_dif
     return np.all((diffs >= min_diff) & (diffs <= max_diff))
 
 
+def is_safe(arr: np.ndarray) -> bool:
+    return is_strictly_monotonic(arr) and \
+           are_adjacent_levels_within_range(arr)
+
+
 def solve_part1(data: list[list[int]]) -> int | None:
     """Number of safe reports
 
@@ -42,14 +47,29 @@ def solve_part1(data: list[list[int]]) -> int | None:
     """
     safe_count = 0
     for report_levels in data:
-        if is_strictly_monotonic(np.asarray(report_levels)) and \
-                are_adjacent_levels_within_range(np.asarray(report_levels)):
+        if is_safe(np.asarray(report_levels)):
             safe_count += 1
     return safe_count
 
 
 def solve_part2(data: list[list[int]]) -> int | None:
-    return None
+    """With "dampener"
+
+    Same as part 1, but if remove any ONE level from the report makes
+    it safe, then the report is also considered safe.
+    """
+    safe_count = 0
+    for report_levels in data:
+        if is_safe(np.asarray(report_levels)):
+            safe_count += 1
+        else:
+            # Check if removing any one level makes it safe
+            for i in range(len(report_levels)):
+                modified_report = np.delete(np.asarray(report_levels), i)
+                if is_safe(modified_report):
+                    safe_count += 1
+                    break
+    return safe_count
 
 
 def main():
@@ -63,11 +83,11 @@ def main():
     assert sample_result_1 == expected_sample_result_1, \
         f"Expected {expected_sample_result_1} but got {sample_result_1}"
 
-    # # Part 2 test
-    # sample_result_2 = solve_part2(sample_data)
-    # expected_sample_result_2 = 0
-    # assert sample_result_2 == expected_sample_result_2, \
-    #     f"Expected {expected_sample_result_2} but got {sample_result_2}"
+    # Part 2 test
+    sample_result_2 = solve_part2(sample_data)
+    expected_sample_result_2 = 4
+    assert sample_result_2 == expected_sample_result_2, \
+        f"Expected {expected_sample_result_2} but got {sample_result_2}"
 
     # Load actual input data
     input_data = read_input('input.txt')
@@ -78,7 +98,8 @@ def main():
     print(f"Part 1 -- Number of safe reports: {result_1}")
 
     result_2 = solve_part2(input_data)
-    print(f"Part 2 -- ???: {result_2}")
+    print(f"Part 2 -- Number of safe reports: {result_2}")
+
 
 if __name__ == "__main__":
     main()
